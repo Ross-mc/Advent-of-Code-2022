@@ -1,12 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-
-const getInput = () => {
-  return fs.readFileSync(path.join(__dirname, './input.txt'));
-};
+const { getInput } = require('../utils/getInput');
 
 const getLines = () => {
-  const buf = getInput();
+  const buf = getInput('01');
   const lines = buf.toString().split('\n');
   return lines;
 };
@@ -30,4 +25,6 @@ const findElfWithMostCalories = () => {
   return { mostCalories: topThree[2], totalOfTopThree };
 };
 
-console.log(findElfWithMostCalories());
+module.exports = {
+  findElfWithMostCalories,
+};
