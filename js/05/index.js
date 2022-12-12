@@ -1,6 +1,6 @@
 const { getLines } = require('../utils/getLines');
 
-const stacks = {
+const originalStacks = {
   1: [],
   2: [],
   3: [],
@@ -18,39 +18,55 @@ const getStartConfig = (startingLines) => {
   //to target the letter for each stack it is (n - 1) * 4 + 1
 
   for (const line of startingLines) {
-    for (const [idx, stack] of Object.entries(stacks)) {
+    for (const [idx, stack] of Object.entries(originalStacks)) {
       const targetIdx = (idx - 1) * 4 + 1;
       if (line[targetIdx] !== ' ') {
         stack.push(line[targetIdx]);
       }
     }
   }
+  return originalStacks;
 };
 
-const processInstruction = (instruction) => {
+const processInstruction = (instruction, stacks) => {
   //instruction move 1 from 2 to 1
   const [_, quantity, __, from, ___, to] = instruction.split(' ');
   const boxesToMove = stacks[from].splice(0, quantity);
   stacks[to].unshift(...boxesToMove.reverse());
 };
 
-const getTopOfStack = () => {
-  const lines = getLines('05');
-  getStartConfig(lines.slice(0, 8));
-  for (const line of lines.slice(10, lines.length)) {
-    processInstruction(line);
-  }
+const processNewInstruction = (instruction, stacks) => {
+  //instruction move 1 from 2 to 1
+  const [_, quantity, __, from, ___, to] = instruction.split(' ');
+  const boxesToMove = stacks[from].splice(0, quantity);
+  stacks[to].unshift(...boxesToMove);
+};
+
+const getTopOfStack = (stacks) => {
   let topOfStack = '';
   for (const stack of Object.values(stacks)) {
     if (stack[0]) {
       topOfStack += stack[0];
     }
   }
+  return topOfStack;
+};
+
+const moveBoxes = () => {
+  const lines = getLines('05');
+  const stacks = JSON.parse(JSON.stringify(getStartConfig(lines.slice(0, 8))));
+  const stacksForPartTwo = JSON.parse(JSON.stringify(getStartConfig(lines.slice(0, 8))));
+  for (const line of lines.slice(10, lines.length)) {
+    processInstruction(line, stacks);
+    processNewInstruction(line, stacksForPartTwo);
+  }
+
   return {
-    taskOne: topOfStack,
+    taskOne: getTopOfStack(stacks),
+    taskTwo: getTopOfStack(stacksForPartTwo),
   };
 };
 
 module.exports = {
-  getTopOfStack,
+  moveBoxes,
 };
